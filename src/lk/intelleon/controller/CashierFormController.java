@@ -28,16 +28,24 @@ import lk.intelleon.bo.custom.CustomerBO;
 import lk.intelleon.bo.custom.OrderBO;
 import lk.intelleon.bo.custom.ProductBO;
 import lk.intelleon.bo.custom.RefBO;
+import lk.intelleon.db.DBConnection;
 import lk.intelleon.dto.*;
 import lk.intelleon.view.tm.TempOrderTM;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 public class CashierFormController {
@@ -348,6 +356,7 @@ public class CashierFormController {
                 getAllOrderIdFromArray();
                 getAllProcessingOrder();
                 clear();
+                showReport();
                 tblTempOrder.setItems(null);
             }else {
                 new Alert( Alert.AlertType.WARNING,"Fail !" ).show();
@@ -566,6 +575,30 @@ public class CashierFormController {
         txtDiscount.setText( "" );
         txtOrderQty.setText( "" );
         lblTotal.setText( "" );
+    }
+
+    public void showReport(){
+        try {
+            Connection connection = DBConnection.getInstance().getConnection();
+
+            JasperPrint jp;
+            Map param = new HashMap();
+
+            jp = JasperFillManager.fillReport("report/jasperReport.jasper",
+                    param,connection);
+
+            JasperViewer viewer = new JasperViewer(jp,false);
+            viewer.setTitle("Super-Market");
+            viewer.setVisible(true);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (JRException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
