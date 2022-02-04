@@ -31,9 +31,7 @@ import lk.intelleon.bo.custom.RefBO;
 import lk.intelleon.db.DBConnection;
 import lk.intelleon.dto.*;
 import lk.intelleon.view.tm.TempOrderTM;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.view.JasperViewer;
 
 import java.io.IOException;
@@ -87,6 +85,8 @@ public class CashierFormController {
     static ArrayList< TempDataDTO > temps = new ArrayList<>( );
 
     static ArrayList< TempTableDTO > tempTableArray = new ArrayList<>( );
+
+    String tot;
 
 
     CustomerBO customerBO = (CustomerBO) BOFactory.getInstance().getBO(BOFactory.BOType.CUSTOMER);
@@ -485,6 +485,8 @@ public class CashierFormController {
         double temp = ((uniPrice * qty) - (dic * qty));
         totalCost+=temp;
 
+        tot = String.valueOf(totalCost);
+
         lblTotal.setText( String.valueOf( totalCost ) );
     }
 
@@ -533,7 +535,6 @@ public class CashierFormController {
             ObservableList< String > productId = FXCollections.observableArrayList( );
             for ( ProductDTO dto:all) {
                 productId.add( dto.getProductId() );
-                System.out.println(dto.getProductId());
             }
             cmbSelectPropertyId.setItems( productId );
         } catch (SQLException | ClassNotFoundException throwables ) {
@@ -581,11 +582,25 @@ public class CashierFormController {
         try {
             Connection connection = DBConnection.getInstance().getConnection();
 
-            JasperPrint jp;
-            Map param = new HashMap();
+//            JasperReport jasperReport = JasperCompileManager.compileReport("report/jasper.jrxml");
+//            JREmptyDataSource dataSource = new JREmptyDataSource();
+//
+//            Map<String, Object> parameter = new HashMap<String,Object>();
+//            parameter.put("orderId","O001");
+//
+//            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameter, dataSource);
+//
+//            JasperExportManager.exportReportToPdfFile(jasperPrint,"D:\\New folder\\jasper.pdf");
 
-            jp = JasperFillManager.fillReport("report/jasperReport.jasper",
-                    param,connection);
+
+            JasperPrint jp;
+
+            Map<String, Object> parameter = new HashMap<String,Object>();
+            parameter.put("orderId",txtOrderId.getText());
+            parameter.put("total",tot);
+
+            jp = JasperFillManager.fillReport("report/SuperMarket.jasper",
+                    parameter,connection);
 
             JasperViewer viewer = new JasperViewer(jp,false);
             viewer.setTitle("Super-Market");

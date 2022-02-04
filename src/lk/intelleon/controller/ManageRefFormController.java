@@ -76,8 +76,6 @@ public class ManageRefFormController {
         try {
             RefDTO refDTO = refBO.searchRef(txtRefId.getText());
 
-            System.out.println(refDTO);
-
             if (refDTO !=null){
                 txtRefName.setText(refDTO.getName());
                 txtIdNumber.setText(refDTO.getIdNumber());
